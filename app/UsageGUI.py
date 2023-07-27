@@ -39,7 +39,8 @@ class Window(QMainWindow):
             gen_pass.append(password)
             self.ui.TextBoxGenerate.setText(password)
             self.Logging(f"generated new password, length {len(password)}")
-
+            s, t = self.gen.check_password_strength(password)
+            self.Logging(f"strength = {s}, time to hake = {t} years")
 
     def Logging(self, text: str) -> None:
-        self.ui.LoggerText.append(f"{datetime.datetime.now().time()} ||{text}\n")
+        self.ui.LoggerText.append(f"{datetime.datetime.now().time()} ||{text}")

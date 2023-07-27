@@ -13,5 +13,6 @@ setting_dict: dict = {
     "db_name": 'yDatabase.db',
 }
 
+db_file = Path(__file__).parent.parent.resolve() / 'yDatabase.db'
 setting_file = Path(__file__).parent.resolve() / '/settings.py'
 pswrd_file = Path(__file__).parent.parent.resolve() / 'common/pswrd.txt'

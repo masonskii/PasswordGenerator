@@ -1,9 +1,9 @@
 import json
 import os
-
 import numpy as np
 
-from .settings import setting_dict, setting_file
+
+from .settings import setting_dict, setting_file, db_file
 
 
 def difference_check_length(Lmin: np.int64, Lmax: np.int64) -> bool:
@@ -33,62 +33,60 @@ def check_settings() -> str:
             res: str = ""
             if rel['lang'] != setting_dict['lang']:
                 setting_dict['lang'] = rel['lang']
-                res += f'lang switched from {setting_dict["lang"]} to {rel["lang"]}\n'
+                res += f'lang switched from {setting_dict["lang"]} to {rel["lang"]} '
             if rel['Lmin'] != setting_dict['Lmin']:
                 setting_dict['Lmin'] = rel['Lmin']
-                res += f'Lmin switched from {setting_dict["Lmin"]} to {rel["Lmin"]}\n'
+                res += f'Lmin switched from {setting_dict["Lmin"]} to {rel["Lmin"]} '
             if rel['Lmax'] != setting_dict['Lmax']:
                 setting_dict['Lmax'] = rel['Lmax']
                 res += f'Lmax switched from {setting_dict["Lmax"]} to {rel["Lmax"]}\n'
             if rel['set']['first_number'] != setting_dict['set']['first_number']:
                 setting_dict['set']['first_number'] = rel['set']['first_number']
                 res += f'First Number switched from {setting_dict["set"]["first_number"]} to ' \
-                       f'{rel["set"]["first_number"]}\n'
+                       f'{rel["set"]["first_number"]} '
             if rel['set']['onlyLowerCase'] != setting_dict['set']['onlyLowerCase']:
                 setting_dict['set']['onlyLowerCase'] = rel['set']['onlyLowerCase']
                 res += f'onlyLowerCase switched from {setting_dict["set"]["onlyLowerCase"]}' \
-                       f' to {rel["set"]["onlyLowerCase"]}\n'
+                       f' to {rel["set"]["onlyLowerCase"]} '
             if rel['set']['usedPunctuation'] != setting_dict['set']['usedPunctuation']:
                 setting_dict['set']['usedPunctuation'] = rel['set']['usedPunctuation']
                 res += f'usedPunctuation switched from {setting_dict["set"]["usedPunctuation"]}' \
-                       f' to {rel["set"]["usedPunctuation"]}\n'
+                       f' to {rel["set"]["usedPunctuation"]} '
             if rel['set']['usedDigits'] != setting_dict['set']['usedDigits']:
                 setting_dict['set']['usedDigits'] = rel['set']['usedDigits']
                 res += f'usedDigits switched from {setting_dict["set"]["usedDigits"]}' \
-                       f' to {rel["set"]["usedDigits"]}\n'
+                       f' to {rel["set"]["usedDigits"]} '
             if rel['db_name'] != setting_dict['db_name']:
                 setting_dict['db_name'] = rel['db_name']
                 res += f'db_name switched from {setting_dict["db_name"]} to {rel["db_name"]}\n'
         return res
     except FileNotFoundError:
-        res: str = "The 'docs' directory does not exist\n"
+        res: str = "The 'docs' directory does not exist "
         return res
 
 
 def check_or_create_files() -> str:
     if os.path.exists(setting_dict['db_name']) and os.path.exists(setting_file):
-        res: str = "setting file found and database found\n"
+        res: str = "setting file found and database found "
         return res
     else:
-        res: str = "database or setting file not found ... creating\n"
+        res: str = "database or setting file not found ... creating "
         # Create an empty file
         try:
             if not os.path.exists(setting_dict['db_name']):
                 # Open the file in write mode to create it
                 with open(setting_dict['db_name'], 'w') as file:
                     pass
-                res += "database created!\n"
+                res += "database created! "
             if not os.path.exists(setting_file):
                 # Open the file in write mode to create it
                 with open(setting_file, 'w') as file:
                     json.dump(setting_dict, file)
                     pass
-                res += "setting file created!\n"
+                res += "setting file created! "
             return res
         except IOError:
-            res = "An error occurred while creating the file.\n"
+            res = "An error occurred while creating the file."
             return res
 
 
-def connect_to_database() -> bool:
-    pass
