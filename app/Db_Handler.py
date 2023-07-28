@@ -16,7 +16,6 @@ sql_create_password_table = """CREATE TABLE IF NOT EXISTS password (
                             );"""
 
 class Db_handler:
-
     def __init__(self) -> None:
         self.conn = None
         try:

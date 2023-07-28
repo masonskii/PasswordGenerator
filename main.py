@@ -6,8 +6,6 @@ from PyQt6.QtWidgets import QApplication, QWidget
 from app.utils import check_settings
 
 if __name__ == '__main__':
-    utils.create_connection()
     app = QApplication(sys.argv)
     login_window = UsageGUI.Window()
-    check_settings()
     sys.exit(app.exec())

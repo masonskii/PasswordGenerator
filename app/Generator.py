@@ -1,18 +1,19 @@
 import datetime
+import decimal
+import math
 import numpy as np
 import random
+import re
 import secrets
 import string
-import re
-import math
-import decimal
 from itertools import dropwhile
 
-from .settings import setting_dict, pswrd_file
+from .settings import pswrd_file
 
 
 class Generator:
-    def __init__(self):
+    def __init__(self, settings: dict):
+        self.settings = settings
         self.apl = str()
 
     def generate(self, min: np.int64, max: np.int64) -> list[str | np.int8]:
@@ -22,17 +23,17 @@ class Generator:
         except Exception as e:
             return [self.new_error(e.__str__()), -1]
 
-        if setting_dict['set']['onlyLowerCase']:
+        if self.settings['set']['onlyLowerCase']:
             self.apl: str = string.ascii_lowercase
         else:
             self.apl: str = string.ascii_letters
 
-        if setting_dict['set']['usedDigits']:
+        if self.settings['set']['usedDigits']:
             self.apl += string.digits
-        if setting_dict['set']['usedPunctuation']:
+        if self.settings['set']['usedPunctuation']:
             self.apl += string.punctuation
 
-        if setting_dict['set']['first_number']:
+        if self.settings['set']['first_number']:
             first_letter: str = secrets.choice(string.digits)
         else:
             first_letter: str = secrets.choice(string.ascii_letters + string.punctuation)
@@ -90,8 +91,28 @@ class Generator:
             characters = 96  # Общее количество возможных символов
 
         entropy = decimal.Decimal(characters) ** length
-        time_to_crack = entropy / decimal.Decimal('2e10')
+        time_to_crack = entropy / decimal.Decimal('3e10')
         return strength, time_to_crack
+
+    def automatic_convert_seconds(self, seconds: decimal.Decimal) -> tuple[decimal.Decimal, str]:
+        seconds = int(seconds)
+
+        levels = [
+            (60, ["second", "seconds"]),
+            (3600, ["minute", "minutes"]),
+            (86400, ["hour", "hours"]),
+            (2592000, ["day", "days"]),
+            (31536000, ["month", "months"]),
+        ]
+
+        for level, labels in levels:
+            if seconds < level:
+                quantity = seconds // (level // 60)
+                label = labels[0] if quantity % 10 == 1 else labels[1]
+                return quantity, label
+
+        label = "year" if seconds // 3153600000 % 10 == 1 else "years"
+        return seconds // 3153600000, label
 
     @staticmethod
     def new_error(error_text: str) -> str:

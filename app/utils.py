@@ -1,9 +1,8 @@
 import json
-import os
 import numpy as np
+import os
 
-
-from .settings import setting_dict, setting_file, db_file
+from .settings import setting_file, db_file
 
 
 def difference_check_length(Lmin: np.int64, Lmax: np.int64) -> bool:
@@ -14,7 +13,7 @@ def change_settings() -> bool:
     pass
 
 
-def rewrite_json() -> str:
+def rewrite_json(setting_dict) -> str:
     try:
         res: str = ""
         with open(setting_file, 'w') as f:
@@ -26,10 +25,12 @@ def rewrite_json() -> str:
         return res
 
 
-def check_settings() -> str:
+def check_settings() -> dict:
     try:
         with open(setting_file, 'r') as f:
             rel = json.load(f)
+
+            """
             res: str = ""
             if rel['lang'] != setting_dict['lang']:
                 setting_dict['lang'] = rel['lang']
@@ -56,32 +57,40 @@ def check_settings() -> str:
                 setting_dict['set']['usedDigits'] = rel['set']['usedDigits']
                 res += f'usedDigits switched from {setting_dict["set"]["usedDigits"]}' \
                        f' to {rel["set"]["usedDigits"]} '
-            if rel['db_name'] != setting_dict['db_name']:
-                setting_dict['db_name'] = rel['db_name']
-                res += f'db_name switched from {setting_dict["db_name"]} to {rel["db_name"]}\n'
-        return res
+             """
+        return rel
     except FileNotFoundError:
-        res: str = "The 'docs' directory does not exist "
-        return res
+        return None
 
 
 def check_or_create_files() -> str:
-    if os.path.exists(setting_dict['db_name']) and os.path.exists(setting_file):
+    if os.path.exists(db_file) and os.path.exists(setting_file):
         res: str = "setting file found and database found "
         return res
     else:
         res: str = "database or setting file not found ... creating "
         # Create an empty file
         try:
-            if not os.path.exists(setting_dict['db_name']):
+            if not os.path.exists(db_file):
                 # Open the file in write mode to create it
-                with open(setting_dict['db_name'], 'w') as file:
+                with open(db_file, 'w') as file:
                     pass
                 res += "database created! "
             if not os.path.exists(setting_file):
                 # Open the file in write mode to create it
                 with open(setting_file, 'w') as file:
-                    json.dump(setting_dict, file)
+                    json.dump(
+                        {
+                            "lang": "en",
+                            "Lmin": 12,
+                            "Lmax": 20,
+                            "set": {
+                                "first_number": 0,
+                                "onlyLowerCase": 0,
+                                "usedPunctuation": 1,
+                                "usedDigits": 1
+                            }
+                        }, file)
                     pass
                 res += "setting file created! "
             return res
@@ -90,3 +99,5 @@ def check_or_create_files() -> str:
             return res
 
 
+def formated_json(dict: dict) -> str:
+    return json.dumps(dict, indent=4)
