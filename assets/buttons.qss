@@ -1,0 +1,10 @@
+QPushButton#ButtonGenerate{
+    padding: 5;
+    border: 1px solid #f4726e;
+    border-radius: 15%;
+}
+
+QPushButton#ButtonGenerate:hover {
+    border: 1px solid #f4726e;
+    border-radius: 25%;
+}

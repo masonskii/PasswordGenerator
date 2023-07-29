@@ -1,7 +1,8 @@
 import datetime
 import decimal
 import math
-from typing import Tuple
+from _decimal import Decimal
+from typing import Tuple, Any
 
 import numpy as np
 import random
@@ -17,6 +18,7 @@ class Generator:
     """
 
     """
+
     def __init__(self, settings: dict):
         """
 
@@ -85,18 +87,12 @@ class Generator:
                     return ['Do not use so common password.', False]
         return ["good password", True]
 
-    def check_password_strength(self, password: str) -> list[np.float64, np.float64]:
+    def check_password_strength(self, password: str) -> tuple[float | int | Any, Decimal]:
         """
 
         :param password:
         :return:
         """
-        # Параметры сложности пароля
-        LENGTH_WEIGHT: np.int64 = 20
-        DIGIT_WEIGHT: np.int64 = 25
-        UPPERCASE_WEIGHT: np.int64 = 20
-        LOWERCASE_WEIGHT: np.int64 = 20
-        SPECIAL_CHAR_WEIGHT: np.int64 = 15
 
         # Шаблон регулярного выражения для проверки условий
         patterns = [

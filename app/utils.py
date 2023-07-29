@@ -1,8 +1,11 @@
 import json
+from typing import Any
+
 import numpy as np
 import os
 
-from .settings import setting_file, db_file
+from .Db_Handler import Db_handler
+from .settings import setting_file, db_file, sql_create_login_table, sql_create_password_table
 
 
 def difference_check_length(Lmin: np.int64, Lmax: np.int64) -> bool:
@@ -40,7 +43,7 @@ def rewrite_json(setting_dict) -> str:
         return res
 
 
-def check_settings() -> dict:
+def check_settings() -> Any | None:
     """
 
     :return:
@@ -48,35 +51,6 @@ def check_settings() -> dict:
     try:
         with open(setting_file, 'r') as f:
             rel = json.load(f)
-
-            """
-            res: str = ""
-            if rel['lang'] != setting_dict['lang']:
-                setting_dict['lang'] = rel['lang']
-                res += f'lang switched from {setting_dict["lang"]} to {rel["lang"]} '
-            if rel['Lmin'] != setting_dict['Lmin']:
-                setting_dict['Lmin'] = rel['Lmin']
-                res += f'Lmin switched from {setting_dict["Lmin"]} to {rel["Lmin"]} '
-            if rel['Lmax'] != setting_dict['Lmax']:
-                setting_dict['Lmax'] = rel['Lmax']
-                res += f'Lmax switched from {setting_dict["Lmax"]} to {rel["Lmax"]}\n'
-            if rel['set']['first_number'] != setting_dict['set']['first_number']:
-                setting_dict['set']['first_number'] = rel['set']['first_number']
-                res += f'First Number switched from {setting_dict["set"]["first_number"]} to ' \
-                       f'{rel["set"]["first_number"]} '
-            if rel['set']['onlyLowerCase'] != setting_dict['set']['onlyLowerCase']:
-                setting_dict['set']['onlyLowerCase'] = rel['set']['onlyLowerCase']
-                res += f'onlyLowerCase switched from {setting_dict["set"]["onlyLowerCase"]}' \
-                       f' to {rel["set"]["onlyLowerCase"]} '
-            if rel['set']['usedPunctuation'] != setting_dict['set']['usedPunctuation']:
-                setting_dict['set']['usedPunctuation'] = rel['set']['usedPunctuation']
-                res += f'usedPunctuation switched from {setting_dict["set"]["usedPunctuation"]}' \
-                       f' to {rel["set"]["usedPunctuation"]} '
-            if rel['set']['usedDigits'] != setting_dict['set']['usedDigits']:
-                setting_dict['set']['usedDigits'] = rel['set']['usedDigits']
-                res += f'usedDigits switched from {setting_dict["set"]["usedDigits"]}' \
-                       f' to {rel["set"]["usedDigits"]} '
-             """
         return rel
     except FileNotFoundError:
         return None
@@ -88,8 +62,7 @@ def check_or_create_files() -> str:
     :return:
     """
     if os.path.exists(db_file) and os.path.exists(setting_file):
-        res: str = "setting file found and database found "
-        return res
+        res: str = "database found, setting file found"
     else:
         res: str = "database or setting file not found ... creating "
         # Create an empty file
@@ -98,7 +71,13 @@ def check_or_create_files() -> str:
                 # Open the file in write mode to create it
                 with open(db_file, 'w') as file:
                     pass
-                res += "database created! "
+                db = Db_handler()
+                db.create_table(sql_create_login_table)
+                db.create_table(sql_create_password_table)
+                db.insert_value_in_table('login', ["admin", "admin"])
+                res += f"database created! table  {str('{')}\n '{sql_create_login_table}\n{str('}')}\n" \
+                       f"{str('{')}\n{sql_create_password_table}\n{str('}')}\nAdmin user created with login=admin, password=admin"
+
             if not os.path.exists(setting_file):
                 # Open the file in write mode to create it
                 with open(setting_file, 'w') as file:
@@ -116,16 +95,16 @@ def check_or_create_files() -> str:
                         }, file)
                     pass
                 res += "setting file created! "
-            return res
         except IOError:
             res = "An error occurred while creating the file."
             return res
+    return res
 
 
-def formated_json(dict: dict) -> str:
+def formated_json(rel: dict) -> str:
     """
 
-    :param dict:
+    :param rel:
     :return:
     """
-    return json.dumps(dict, indent=4)
+    return json.dumps(rel, indent=4)
